@@ -65,6 +65,11 @@ class CensorContext {
   }
 }
 
+/**
+ * A class for providing context and interaction within the Censor handle.
+ * @class
+ * @public
+ */
 class CensorCallContext extends CensorContext {
   next(...args) {
     return this.parent.call(this.name, ...args)

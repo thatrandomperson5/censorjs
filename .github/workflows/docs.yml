@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: echo "\n export {censor, CensorObject}" >> src/censor.js
+      - run: echo "export {censor, CensorObject}" >> src/censor.js
       - run: npm install -g documentation
       - run: documentation build src/** -f html --github -o docs
       - name: Upload artifact

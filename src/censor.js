@@ -1,4 +1,23 @@
 /**
+ * A event & call interception library for javascript. See [README]() for more examples and non-doc details.
+ * @module Censor
+ * @example
+ * censor(window).whenCall("fetch", async (ctx) => {
+ *   console.log(ctx.args) // Log the arguments passed to fetch
+ *   var result = await ctx.pass() // Run the original fetch function
+ *   console.log(result.status) // Log the result status
+ *   return result // Pass the response
+ * }).on("load", (ctx, event) => {
+ *   console.log("loaded")  // Signifiy that the event was run
+ *   return ctx.pass() // Run the original handler
+ * })
+ *
+ *  fetch("https://echo.zuplo.io").catch((error) => {
+ *    console.error(error.message)
+ *  })
+ */
+
+/**
  * See [mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#description).
  * @typedef {Object} PropertyDescription
  * @property {bool} [configurable]
@@ -298,8 +317,8 @@ class CensorClass {
   }
 
   /**
-   * Generate a class initalization function to be used as a replacement. 
-   * @example 
+   * Generate a class initalization function to be used as a replacement.
+   * @example
    * var webSocketCensor = censor(WebSocket)
    * // censor stuff
    * WebSocket = webSocketCensor.getFunc()

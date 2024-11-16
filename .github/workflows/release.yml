@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 18
       - run: cp src/censor.js release/censor.module.js
-      - run: echo "\n export {censor, CensorObject}" >> release/censor.module.js
+      - run: echo "export {censor, CensorObject}" >> release/censor.module.js
       - run: npm i minify -g
       - run: minify src/censor.js > release/censor.min.js
       - run: minify release/censor.module.js > release/censor.module.min.js

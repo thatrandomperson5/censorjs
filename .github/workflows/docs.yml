@@ -37,6 +37,7 @@ jobs:
           node-version: 18
       - run: npm install -g documentation
       - run: documentation build src/** -f html --github -o docs
+      - run: echo "\n export {censor, CensorObject}" >> src/censor.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

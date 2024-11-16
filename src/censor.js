@@ -10,15 +10,6 @@
  */
 
 /**
- *  * The main callback function type. Remember to always call {@link CensorContext#pass} or {@link CensorContext#next} within but not both.
- * @callback CensorObject~genericHandle
- * @param {CensorContext|CensorCallContext} ctx - The passed context.
- * @param {...*} var_args - Any number of arguments passed to the context.
- * @returns {*} - The result you want to be passed to the original.
- * 
- */
-
-/**
  * A class for providing context and interaction within the Censor handle.
  * @class
  * @constructor
@@ -27,7 +18,7 @@
 class CensorContext {
   /**
    * Arguments that are passed to the context when. Usually function arguments.
-   * @type {...*}
+   * @type {*[]}
    * @public
    */
   args
@@ -87,6 +78,15 @@ class CensorCallContext extends CensorContext {
  * @public
  */
 class CensorObject {
+  /**
+   * The main callback function type. Remember to always call {@link CensorContext#pass} or {@link CensorContext#next} within but not both.
+   * @callback genericHandle
+   * @param {CensorContext|CensorCallContext} ctx - The passed context.
+   * @param {...*} var_args - Any number of arguments passed to the context.
+   * @returns {*} - The result you want to be passed to the original.
+   *
+   */
+
   /**
    * Reference to the original object.
    * @type {Object}
@@ -154,7 +154,7 @@ class CensorObject {
   /**
    * Register a handle for when function with name is called from base object
    * @param {string} name - The name of the function.
-   * @param {CensorObject~genericHandle} handle - The handler function, see examples.
+   * @param {genericHandle} handle - The handler function, see examples.
    * @returns {CensorObject} - Returns self for chaining.
    */
   whenCall(name, handle) {
@@ -220,7 +220,7 @@ class CensorObject {
   /**
    * Register a handle for when a event is triggered and responded to from base object
    * @param {string} event - The name of the event.
-   * @param {CensorObject~genericHandle} handle - The handle the will be applied to all listeners.
+   * @param {genericHandle} handle - The handle the will be applied to all listeners.
    * @returns {CensorObject} - Returns self for chaining.
    */
   on(event, handle) {
@@ -262,6 +262,7 @@ class CensorObject {
 /**
  * Practiaclly identical function-wise to {@link CensorObject}, used to censor uninitiated classes. The `genFunc` function listed below is the only unique function of this class.
  * @class
+ * @constructor
  * @public
  */
 class CensorClass {
@@ -270,6 +271,10 @@ class CensorClass {
   #callHandles
   #attrHandles
 
+  /**
+   * Create a CensorClass object
+   * @param {function(...*):Object} cls - The class descriptor function.
+   */
   constructor(cls) {
     this.cls = cls
     this.#eventHandles = {}
@@ -325,4 +330,3 @@ function censor(obj) {
   } else {
     throw new TypeError("Can't install censor on " + typeof obj)
   }
-}

@@ -159,7 +159,7 @@ class CensorObject {
   /**
    * Register a handle for when function with name is called from base object
    * @param {string} name - The name of the function.
-   * @param {genericHandle} handle - The handler function, see examples.
+   * @param {genericHandle} handle - The handler function.
    * @returns {CensorObject} - Returns self for chaining.
    */
   whenCall(name, handle) {
@@ -298,7 +298,11 @@ class CensorClass {
   }
 
   /**
-   * Generate a class initalization function to be used as a replacement. Example: `WebSocket = webSocketCensor.getFunc()`
+   * Generate a class initalization function to be used as a replacement. 
+   * @example 
+   * var webSocketCensor = censor(WebSocket)
+   * // censor stuff
+   * WebSocket = webSocketCensor.getFunc()
    * @returns {function(...*):Object} - Returns a valid initalization function.
    */
   genFunc() {

@@ -330,3 +330,4 @@ function censor(obj) {
   } else {
     throw new TypeError("Can't install censor on " + typeof obj)
   }
+}

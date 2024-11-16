@@ -1,5 +1,5 @@
 /**
- * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#description
+ * See [mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#description).
  * @typedef {Object} PropertyDescription
  * @property {bool} [configurable]
  * @property {bool} [enumerable]
@@ -7,6 +7,15 @@
  * @property {bool} [writable]
  * @property {function():void} [get]
  * @property {function(*):void} [set]
+ */
+
+/**
+ *  * The main callback function type. Remember to always call {@link CensorContext#pass} or {@link CensorContext#next} within but not both.
+ * @callback CensorObject~genericHandle
+ * @param {CensorContext|CensorCallContext} ctx - The passed context.
+ * @param {...*} var_args - Any number of arguments passed to the context.
+ * @returns {*} - The result you want to be passed to the original.
+ * 
  */
 
 /**
@@ -30,6 +39,13 @@ class CensorContext {
   parent
 
   /**
+   * The "original" based on situation.
+   * @type {function(...*):*}
+   * @public
+   */
+  callback
+
+  /**
    * Create a context object. (Not for general use)
    * @param {CensorObject} parent - The connected Censor object.
    * @param {string} name - The name of the attribute, function, or event that is currently connected.
@@ -46,7 +62,7 @@ class CensorContext {
    * @returns {*} - The result of the original function.
    */
   next(...args) {
-    return this.parent.call(this.name, ...args)
+    return this.callback(...args)
   }
 
   /**
@@ -58,10 +74,9 @@ class CensorContext {
   }
 }
 
-class CensorEventContext extends CensorContext {
-  callback
+class CensorCallContext extends CensorContext {
   next(...args) {
-    return this.callback(...args)
+    return this.parent.call(this.name, ...args)
   }
 }
 
@@ -139,7 +154,7 @@ class CensorObject {
   /**
    * Register a handle for when function with name is called from base object
    * @param {string} name - The name of the function.
-   * @param {function(CensorContext, ...*):*} handle - The handler function, see examples.
+   * @param {CensorObject~genericHandle} handle - The handler function, see examples.
    * @returns {CensorObject} - Returns self for chaining.
    */
   whenCall(name, handle) {
@@ -150,7 +165,7 @@ class CensorObject {
       this.object["_CENSOR_" + name] = this.object[name] // Override old hooks
     }
 
-    var ctx = new CensorContext(this, name)
+    var ctx = new CensorCallContext(this, name)
     var f
     if (handle[Symbol.toStringTag] === "AsyncFunction") {
       f = async (...args) => {
@@ -205,7 +220,7 @@ class CensorObject {
   /**
    * Register a handle for when a event is triggered and responded to from base object
    * @param {string} event - The name of the event.
-   * @param {function(CensorEventContext, ...*):*} handle - The handle the will be applied to all listeners.
+   * @param {CensorObject~genericHandle} handle - The handle the will be applied to all listeners.
    * @returns {CensorObject} - Returns self for chaining.
    */
   on(event, handle) {
@@ -220,7 +235,7 @@ class CensorObject {
     this.whenAttr("on" + event, {
       set: (internal) => {
         return (...args) => {
-          var ctx = new CensorEventContext(topLevelObj, event)
+          var ctx = new CensorContext(topLevelObj, event)
           ctx.callback = internal
           ctx.args = args
           return handle(ctx, ...args)
@@ -229,7 +244,7 @@ class CensorObject {
     })
     this.object.onclick = prev // apply to old onclick attribute
     this.whenCall("addEventListener", (ctx, type, listener, other) => {
-      var newCtx = new CensorEventContext(topLevelObj, event)
+      var newCtx = new CensorContext(topLevelObj, event)
       newCtx.callback = listener
       ctx.next(
         type,
@@ -245,7 +260,7 @@ class CensorObject {
 }
 
 /**
- * Practiaclly identical function-wise to `CensorObject`, used to censor uninitiated classes. The `genFunc` function listed below is the only unique function of this class.
+ * Practiaclly identical function-wise to {@link CensorObject}, used to censor uninitiated classes. The `genFunc` function listed below is the only unique function of this class.
  * @class
  * @public
  */

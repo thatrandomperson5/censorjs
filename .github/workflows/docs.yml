@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: 18
       - run: npm list documentation | npm install documentation 
-      - run: documentation build src/** -f html --github -o docs
+      - run: npm run documentation build src/** -f html --github -o docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

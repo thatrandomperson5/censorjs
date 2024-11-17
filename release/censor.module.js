@@ -1,4 +1,23 @@
 /**
+ * A event & call interception library for javascript. See [README](https://github.com/thatrandomperson5/censorjs/blob/main/README.md) for more examples and non-doc details.
+ * @module Censor
+ * @example
+ * censor(window).whenCall("fetch", async (ctx) => {
+ *   console.log(ctx.args) // Log the arguments passed to fetch
+ *   var result = await ctx.pass() // Run the original fetch function
+ *   console.log(result.status) // Log the result status
+ *   return result // Pass the response
+ * }).on("load", (ctx, event) => {
+ *   console.log("loaded")  // Signifiy that the event was run
+ *   return ctx.pass() // Run the original handler
+ * })
+ *
+ *  fetch("https://echo.zuplo.io").catch((error) => {
+ *    console.error(error.message)
+ *  })
+ */
+
+/**
  * See [mozilla documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#description).
  * @typedef {Object} PropertyDescription
  * @property {bool} [configurable]
@@ -136,6 +155,7 @@ class CensorObject {
    * @param {Object} object - The base object.
    */
   constructor(object) {
+    CensorObject.typeCheck(object, "object")
     this.object = object
     this.#eventHandleCache = {}
   }
@@ -265,7 +285,7 @@ class CensorObject {
 }
 
 /**
- * Practiaclly identical function-wise to {@link CensorObject}, used to censor uninitiated classes. The `genFunc` function listed below is the only unique function of this class.
+ * Practiaclly identical function-wise to {@link CensorObject}, used to censor uninitiated classes. The `genFunc` and `apply` functions listed below is the only unique functions of this class.
  * @class
  * @constructor
  * @public
@@ -281,6 +301,7 @@ class CensorClass {
    * @param {function(...*):Object} cls - The class descriptor function.
    */
   constructor(cls) {
+    CensorObject.typeCheck(cls, "function")
     this.cls = cls
     this.#eventHandles = {}
     this.#callHandles = {}
@@ -289,17 +310,41 @@ class CensorClass {
 
   whenCall(name, handle) {
     this.#callHandles[name] = handle
+    return this
   }
   whenAttr(name, handles) {
     this.#attrHandles[name] = handles
+    return this
   }
   on(name, handle) {
     this.#eventHandles[name] = handle
+    return this
+  }
+
+
+  /**
+   * Apply all censor handles to a instance of the given class. 
+   * @param {Object} obj - A instance of the given class or any other fitting object.
+   * @returns {CensorClass} - Returns self for chaining.
+   */
+  apply(obj) {
+    var c = new CensorObject(obj)
+
+    for (const [key, value] of Object.entries(this.#callHandles)) {
+      c.whenCall(key, value)
+    }
+    for (const [key, value] of Object.entries(this.#attrHandles)) {
+      c.whenAttr(key, value)
+    }
+    for (const [key, value] of Object.entries(this.#eventHandles)) {
+      c.on(key, value)
+    }
+    return this
   }
 
   /**
-   * Generate a class initalization function to be used as a replacement. 
-   * @example 
+   * Generate a class initalization function to be used as a replacement.
+   * @example
    * var webSocketCensor = censor(WebSocket)
    * // censor stuff
    * WebSocket = webSocketCensor.getFunc()
@@ -309,18 +354,7 @@ class CensorClass {
     let originalObject = this
     return function (...args) {
       var result = new originalObject.cls(...args)
-      var resultCensor = new CensorObject(result)
-
-      for (const [key, value] of Object.entries(originalObject.#callHandles)) {
-        resultCensor.whenCall(key, value)
-      }
-      for (const [key, value] of Object.entries(originalObject.#attrHandles)) {
-        resultCensor.whenAttr(key, value)
-      }
-      for (const [key, value] of Object.entries(originalObject.#eventHandles)) {
-        resultCensor.on(key, value)
-      }
-
+      originalObject.apply(result)
       return result
     }
   }

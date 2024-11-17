@@ -60,7 +60,7 @@ jobs:
           --project-description "A javascript event/function interception library." 
           -f html --github -o docs/$DOCPATH 
           ||
-          documentation build src/** # Legacy
+          documentation build src/**
           --project-name Censor 
           --project-version $DOCPATH
           --project-homepage "https://github.com/thatrandomperson5/censorjs"

@@ -3,6 +3,7 @@ toc:
     file: ../README.md
     
   - name: API
-  - children: 
-    - Censor
+    description: All functions, variables and classes and their types.
+    children: 
+      - Censor
       

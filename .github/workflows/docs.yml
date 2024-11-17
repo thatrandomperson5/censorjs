@@ -75,3 +75,4 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           title: Update Documentation
+          base: main

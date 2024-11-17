@@ -97,12 +97,11 @@ class CensorCallContext extends CensorContext {
 }
 
 /**
- * The main callback function type. Remember to always call {@link CensorContext#pass} or {@link CensorContext#next} within but not both.
+ * The main callback function type. Note that the effects of `.pass()`/`.next()` change based om where the context was assigned from. ([See Pass/NextEffect](https://github.com/thatrandomperson5/censorjs/tree/main?tab=readme-ov-file#censoring-functions))
  * @callback genericHandle
  * @param {CensorContext|CensorCallContext} ctx - The passed context.
  * @param {...*} var_args - Any number of arguments passed to the context.
  * @returns {*} - The result you want to be passed to the original.
- *
  */
 
 /**
@@ -173,7 +172,8 @@ class CensorObject {
 
   /**
    * Call the base getter for name from base object.
-   * @param {string} name - The name of the attribute.   
+   * @param {string} name - The name of the attribute.
+   * @returns {*} - The value that was originally returned.
    */
   getAttr(name) {
     return this.object["_CENSOR_get_" + name]() // Required because certain functions can only be called from the right class
@@ -308,7 +308,7 @@ class CensorObject {
 }
 
 /**
- * Practiaclly identical function-wise to {@link CensorObject}, used to censor uninitiated classes. The `genFunc` and `apply` functions listed below is the only unique functions of this class.
+ * Very similar to {@link CensorObject}, used to censor uninitiated classes on initiation. The `genFunc` and `apply` functions listed below is the only unique functions of this class. `whenCall`, `whenAttr` and `on` are all directly equivilent to their {@link CensorObject} counterparts.
  * @class
  * @constructor
  * @public

@@ -88,6 +88,7 @@ class CensorContext {
  * A class for providing context and interaction within the Censor handle.
  * @class
  * @public
+ * @deprecated - since 0.1.1
  */
 class CensorCallContext extends CensorContext {
   next(...args) {
@@ -162,16 +163,30 @@ class CensorObject {
 
   /**
    * Call the base function from base object with name and args.
-   * @private
    * @param {string} name - The name of the function.
    * @param {...*} args - Arguments to pass.
    * @returns {*} - The function result
    */
   call(name, ...args) {
-    if (!this.object.hasOwnProperty("_CENSOR_" + name)) {
-      throw new TypeError('Unregistered function binding for "' + name + '"')
-    }
-    return this.object["_CENSOR_" + name](...args)
+    return this.object["_CENSOR_" + name](...args) // Required because certain functions can only be called from the right class
+  }
+
+  /**
+   * Call the base getter for name from base object.
+   * @param {string} name - The name of the attribute.
+   * @param {*} asgn - Object to assign.
+   */
+  getAttr(name) {
+    return this.object["_CENSOR_get_" + name]() // Required because certain functions can only be called from the right class
+  }
+
+  /**
+   * Call the base setter for name from base object.
+   * @param {string} name - The name of the attribute.
+   * @param {*} asgn - Object to assign.
+   */
+  setAttr(name, asgn) {
+    this.object["_CENSOR_set_" + name](asgn) // Required because certain functions can only be called from the right class
   }
 
   /**
@@ -188,7 +203,10 @@ class CensorObject {
       this.object["_CENSOR_" + name] = this.object[name] // Override old hooks
     }
 
-    var ctx = new CensorCallContext(this, name)
+    var ctx = new CensorContext(this, name)
+    ctx.callback = (...args) => {
+      return this.call(name, ...args) 
+    }
     var f
     if (handle[Symbol.toStringTag] === "AsyncFunction") {
       f = async (...args) => {
@@ -210,7 +228,9 @@ class CensorObject {
   /**
    * Register a handle for when a attribute with name is modified or retrived from base object
    * @param {string} name - The name of the function.
-   * @param {PropertyDescription} handles - The handler functions. (generic JS callback, only accepts get and set)
+   * @param {Object} handles - The handler functions.
+   * @param {genericHandle} [handles.get] - The get handler for the attribute.
+   * @param {genericHandle} [handles.set] - The set handler for the attribute.
    * @returns {CensorObject} - Returns self for chaining.
    */
   whenAttr(name, handles) {
@@ -220,17 +240,24 @@ class CensorObject {
     let description = CensorObject.getPropertyDescriptor(this.object, name)
     this.object["_CENSOR_set_" + name] = description["set"]
     this.object["_CENSOR_get_" + name] = description["get"]
-    let originalObject = this.object
+    let originalObject = this
 
     var desc = {}
+    var context = new CensorContext(this, name)
+
     if (handles.hasOwnProperty("get")) {
       desc["get"] = () => {
-        return handles["get"](originalObject["_CENSOR_get_" + name]())
+        context.args = []
+        context.callback = () => originalObject.getAttr(name)
+        return handles["get"](context)
       }
     }
     if (handles.hasOwnProperty("set")) {
       desc["set"] = (asgn) => {
-        originalObject["_CENSOR_set_" + name](handles["set"](asgn))
+        context.args = [asgn]
+        context.callback = (_asgn) => originalObject.setAttr(name, _asgn)
+
+        handles["set"](context, asgn)
       }
     }
 
@@ -255,13 +282,13 @@ class CensorObject {
     let prevAdd = this.object.addEventListener
 
     this.whenAttr("on" + event, {
-      set: (internal) => {
-        return (...args) => {
+      set: (ctx, internal) => {
+        ctx.next((...args) => {
           var ctx = new CensorContext(topLevelObj, event)
           ctx.callback = internal
           ctx.args = args
           return handle(ctx, ...args)
-        }
+        })
       },
     })
     this.object["on" + event] = prev // apply to old attribute
@@ -318,9 +345,8 @@ class CensorClass {
     return this
   }
 
-
   /**
-   * Apply all censor handles to a instance of the given class. 
+   * Apply all censor handles to a instance of the given class.
    * @param {Object} obj - A instance of the given class or any other fitting object.
    * @returns {CensorClass} - Returns self for chaining.
    */
@@ -371,3 +397,6 @@ function censor(obj) {
     throw new TypeError("Can't install censor on " + typeof obj)
   }
 }
+
+test1()
+test2()

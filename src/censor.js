@@ -97,21 +97,21 @@ class CensorCallContext extends CensorContext {
 }
 
 /**
+ * The main callback function type. Remember to always call {@link CensorContext#pass} or {@link CensorContext#next} within but not both.
+ * @callback genericHandle
+ * @param {CensorContext|CensorCallContext} ctx - The passed context.
+ * @param {...*} var_args - Any number of arguments passed to the context.
+ * @returns {*} - The result you want to be passed to the original.
+ *
+ */
+
+/**
  * The main Censor class. Applies censor effects to any object, and effects are independent of the Censor class object.
  * @class
  * @constructor
  * @public
  */
 class CensorObject {
-  /**
-   * The main callback function type. Remember to always call {@link CensorContext#pass} or {@link CensorContext#next} within but not both.
-   * @callback genericHandle
-   * @param {CensorContext|CensorCallContext} ctx - The passed context.
-   * @param {...*} var_args - Any number of arguments passed to the context.
-   * @returns {*} - The result you want to be passed to the original.
-   *
-   */
-
   /**
    * Reference to the original object.
    * @type {Object}
@@ -173,8 +173,7 @@ class CensorObject {
 
   /**
    * Call the base getter for name from base object.
-   * @param {string} name - The name of the attribute.
-   * @param {*} asgn - Object to assign.
+   * @param {string} name - The name of the attribute.   
    */
   getAttr(name) {
     return this.object["_CENSOR_get_" + name]() // Required because certain functions can only be called from the right class
@@ -205,7 +204,7 @@ class CensorObject {
 
     var ctx = new CensorContext(this, name)
     ctx.callback = (...args) => {
-      return this.call(name, ...args) 
+      return this.call(name, ...args)
     }
     var f
     if (handle[Symbol.toStringTag] === "AsyncFunction") {
@@ -397,6 +396,3 @@ function censor(obj) {
     throw new TypeError("Can't install censor on " + typeof obj)
   }
 }
-
-test1()
-test2()

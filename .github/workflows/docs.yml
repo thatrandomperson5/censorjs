@@ -45,10 +45,10 @@ jobs:
           node-version: 18
       - run: npm install -g documentation
 
-      - run: echo "DOCPATH=${GITHUB_REF:10}" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/')
+      - run: echo "DOCPATH=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+        if: github.event.inputs.tag != ''
       - run: echo "DOCPATH=head" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/') != true
+        if: github.event.inputs.tag == ''
 
       - run: echo "docs/$DOCPATH"
         

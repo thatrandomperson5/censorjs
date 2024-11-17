@@ -38,22 +38,24 @@ jobs:
           node-version: 18
       - run: npm install -g documentation
 
-      - run: echo "doc_path='${GITHUB_REF:10}'" >> $GITHUB_OUTPUT
+      - run: echo "DOCPATH='${GITHUB_REF:10}'" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/')
-      - run: echo "doc_path='head'" >> $GITHUB_OUTPUT
+      - run: echo "DOCPATH='head'" >> $GITHUB_ENV
         if: startsWith(github.ref, 'refs/tags/') != true
+
+      - run: echo "docs/$DOCPATH"
         
       - run: >-
           documentation build src/** -c docs/docs.yml 
           --project-name Censor 
-          --project-version ${{ steps.vars.outputs.doc_path }}
+          --project-version $DOCPATH
           --project-homepage "https://github.com/thatrandomperson5/censorjs"
           --project-description "A javascript event/function interception library."
           
-          -f html --github -o docs/${{ steps.vars.outputs.doc_path }}
+          -f html --github -o docs/$DOCPATH
 
-      - run: sed -i -E 's/\"(assets\/.[^\"]+)\"/\"..\/\1\"/g' "docs/${{ steps.vars.outputs.doc_path }}/index.html"
-      - run: mv docs/${{ steps.vars.outputs.doc_path }}/assets docs/assets
+      - run: sed -i -E 's/\"(assets\/.[^\"]+)\"/\"..\/\1\"/g' "docs/$DOCPATH/index.html"
+      - run: mv docs/$DOCPATH/assets docs/assets
         
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

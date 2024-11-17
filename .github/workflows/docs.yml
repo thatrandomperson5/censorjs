@@ -1,5 +1,5 @@
 # Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy GitHub Pages docs
+name: Build Docs
 
 on:
   # Runs on pushes targeting the default branch
@@ -7,19 +7,20 @@ on:
     branches: ["main"]
     paths: src/**
 
+  # release:
+  #   types: []
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
+  pull-requests: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: "docs"
   cancel-in-progress: false
 
 jobs:
@@ -35,22 +36,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: echo "export {censor, CensorObject}" >> src/censor.js
       - run: npm install -g documentation
-      - run: documentation build src/** -f html --github -o docs
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/
-
-  # Deployment job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - run: documentation build src/** -f html --github -o docs/${}
+        if: startsWith(${GITHUB_REF}, "refs/tags/") != true
+        
+      - run: documentation build src/** -f html --github -o docs/head
+        if: startsWith(${GITHUB_REF}, "refs/tags/")
+        
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7

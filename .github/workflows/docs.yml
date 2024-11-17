@@ -54,7 +54,7 @@ jobs:
           -f html --github -o docs/$DOCPATH
 
       - run: sed -i -E 's/[\x22\x27](assets\/.[^\x22\x27]+)[\x22\x27]/\"..\/\1\"/g' "docs/$DOCPATH/index.html"
-      - run: mv docs/$DOCPATH/assets docs/assets
+      - run: mv -f docs/$DOCPATH/assets docs/assets
         
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

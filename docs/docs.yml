@@ -4,6 +4,4 @@ toc:
     
   - name: API
     description: All functions, variables and classes and their types.
-    children: 
-      - Censor
       

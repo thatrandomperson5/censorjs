@@ -22,6 +22,7 @@ censor(window).whenCall("fetch", async (ctx) => {
 
 ## Links
 * [Docs](https://thatrandomperson5.github.io/censorjs/)
+* [Examples](#examples)
 ## Installation
 ```js
 import { censor } from "https://cdn.jsdelivr.net/gh/thatrandomperson5/censorjs@master/release/censor.module.min.js"
@@ -59,7 +60,7 @@ var windowCensor = new CensorObject(window)
 var webSocketCensor = new CensorClass(WebSocket)
 ```
 Instance censors are implemented automatically, whereas class censors must be manually set in a scope (usually global). (Automatic implementation coming soon)
-```
+```js
 WebSocket = webSocketCensor.genFunc() // Implement your class censoring 
 ```
 ### Censoring Functions
@@ -86,3 +87,65 @@ The general structure goes something like this:
 
 ### Async
 The `whenCall` function supports async handles. These will should be used when the original function is async and can be enabled by passing `async (ctx, arg1) => {doSomething}` as a handler.
+
+## Examples
+Coming soon
+
+### Original Tests
+```html
+<script id="test1">
+  function log(txt) {
+    document.getElementById("outp").textContent += txt.toString() + "\n"
+  }
+
+  function test1() {
+    censor(window, true).whenCall("fetch", async (ctx) => {
+      log(ctx.args)
+      var result = await ctx.pass()
+      log(result.status)
+      return result
+    })
+
+    window.fetch("https://echo.zuplo.io").catch((error) => {
+      console.error(error.message)
+    })
+
+    document.getElementById("btn").onclick = () => {
+      alert("Hello")
+    }
+
+    censor(document.getElementById("btn")).on("click", (ctx, event) => {
+      log(ctx.args)
+      return ctx.pass()
+    })
+
+    document.getElementById("btn").addEventListener("click", () => {
+      log("EVENT CLICK")
+    })
+  }
+  function test2() {
+    var webSocketCensor = censor(WebSocket)
+    webSocketCensor.whenCall("send", (ctx, data) => {
+      console.log(data)
+      return ctx.pass()
+    })
+
+    webSocketCensor.on("message", (ctx, event) => {
+      console.log(event.data)
+      return ctx.pass()
+    })
+
+    WebSocket = webSocketCensor.genFunc()
+
+    let ws = new WebSocket("wss://echo.websocket.org/")
+    ws.onopen = (event) => {
+      ws.send("Here's some text that the server is urgently awaiting!")
+    }
+    ws.onmessage = (event) => {
+      log(event.data)
+    }
+  }
+</script>
+<pre><code id="outp"></code></pre>
+<button id="btn">Button</button>
+```

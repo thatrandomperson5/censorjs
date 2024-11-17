@@ -117,7 +117,6 @@ class CensorObject {
    * @public
    */
   object
-  #eventHandleCache
 
   /**
    * A type assertion util based on `typeof`
@@ -157,7 +156,6 @@ class CensorObject {
   constructor(object) {
     CensorObject.typeCheck(object, "object")
     this.object = object
-    this.#eventHandleCache = {}
   }
 
   // Functions
@@ -255,7 +253,6 @@ class CensorObject {
     let topLevelObj = this
     let prev = this.object["on" + event]
     let prevAdd = this.object.addEventListener
-    this.#eventHandleCache[event] = handle
 
     this.whenAttr("on" + event, {
       set: (internal) => {

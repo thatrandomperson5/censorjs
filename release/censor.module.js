@@ -267,7 +267,7 @@ class CensorObject {
         }
       },
     })
-    this.object.onclick = prev // apply to old onclick attribute
+    this.object["on" + event] = prev // apply to old attribute
     this.whenCall("addEventListener", (ctx, type, listener, other) => {
       var newCtx = new CensorContext(topLevelObj, event)
       newCtx.callback = listener

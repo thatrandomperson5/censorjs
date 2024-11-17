@@ -1,9 +1,6 @@
 toc:
   - name: Censor
     file: ../README.md
-    children: 
     
-  - name: API
-    children:
-      Censor
+  Censor
       

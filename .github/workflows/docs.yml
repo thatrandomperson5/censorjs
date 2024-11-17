@@ -53,7 +53,7 @@ jobs:
           --project-description "A javascript event/function interception library." 
           -f html --github -o docs/$DOCPATH
 
-      - run: sed -i -E 's/\"(assets\/.[^\"]+)\"/\"..\/\1\"/g' "docs/$DOCPATH/index.html"
+      - run: sed -i -E 's/[\x22\x27](assets\/.[^\x22\x27]+)[\x22\x27]/\"..\/\1\"/g' "docs/$DOCPATH/index.html"
       - run: mv docs/$DOCPATH/assets docs/assets
         
       - name: Create Pull Request

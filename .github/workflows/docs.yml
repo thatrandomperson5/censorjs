@@ -38,10 +38,12 @@ jobs:
           node-version: 18
       - run: npm install -g documentation
       - run: documentation build src/** -f html --github -o docs/${GITHUB_REF:10}
-        if: startsWith(${GITHUB_REF}, "refs/tags/") != true
+        if: startsWith(${GITHUB_REF}, "refs/tags/")
         
       - run: documentation build src/** -f html --github -o docs/head
-        if: startsWith(${GITHUB_REF}, "refs/tags/")
+        if: startsWith(${GITHUB_REF}, "refs/tags/") != true
         
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
+        with:
+          title: Update Documentation

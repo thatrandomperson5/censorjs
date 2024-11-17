@@ -1,5 +1,5 @@
 /**
- * A event & call interception library for javascript. See [README](https://github.com/thatrandomperson5/censorjs/blob/main/README.md) for more examples and non-doc details.
+ * The main module of the Censor library. Contains all core features.
  * @module Censor
  * @example
  * censor(window).whenCall("fetch", async (ctx) => {

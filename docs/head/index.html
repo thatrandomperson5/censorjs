@@ -29,26 +29,6 @@
               
                 
                 <li><a
-                  href='#introduction--usage'
-                  class="h5 bold black caps">
-                  Introduction &amp; Usage
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#api'
-                  class="h5 bold black caps">
-                  API
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#censor'
                   class="">
                   Censor
@@ -79,9 +59,7 @@
                   
                   
                     <ul class='list-reset py1-ul pl1'>
-                      
-                        <li class='h5'><span>Instance members</span></li>
-                      
+                      <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
                         href='#censorcontextargs'
@@ -152,9 +130,7 @@
                 <div class='toggle-target display-none'>
                   
                   <ul class='list-reset py1-ul pl1'>
-                    
-                      <li class='h5'><span>Static members</span></li>
-                    
+                    <li class='h5'><span>Static members</span></li>
                     
                       <li><a
                         href='#censorobjecttypecheck'
@@ -172,9 +148,7 @@
                   
                   
                     <ul class='list-reset py1-ul pl1'>
-                      
-                        <li class='h5'><span>Instance members</span></li>
-                      
+                      <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
                         href='#censorobjectobject'
@@ -238,9 +212,7 @@
                   
                   
                     <ul class='list-reset py1-ul pl1'>
-                      
-                        <li class='h5'><span>Instance members</span></li>
-                      
+                      <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
                         href='#censorclassapply'
@@ -282,191 +254,6 @@
       <div id='split-right' class='relative overflow-auto height-viewport-100'>
         
           
-            <div class='keyline-top-not py2'><section class='py2 clearfix'>
-
-  <h2 id='introduction--usage' class='mt0'>
-    Introduction &amp; Usage
-  </h2>
-
-  
-    <h1>Censor</h1>
-<p>A event &#x26; call interception library for javascript. Censor monkeypatches your custom handles to any existing object or class' functions, attributes and events.</p>
-<p>Here is an example of intercepting all proceeding fetch requests and load events:</p>
-<pre class="hljs"><span class="hljs-title function_">censor</span>(<span class="hljs-variable language_">window</span>).<span class="hljs-title function_">whenCall</span>(<span class="hljs-string">&quot;fetch&quot;</span>, <span class="hljs-title function_">async</span> (ctx) =&gt; {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(ctx.<span class="hljs-property">args</span>) <span class="hljs-comment">// Log the arguments passed to fetch</span>
-
-  <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">await</span> ctx.<span class="hljs-title function_">pass</span>() <span class="hljs-comment">// Run the original fetch function</span>
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(result.<span class="hljs-property">status</span>) <span class="hljs-comment">// Log the result status</span>
-
-  <span class="hljs-keyword">return</span> result <span class="hljs-comment">// Pass the response</span>
-}).<span class="hljs-title function_">on</span>(<span class="hljs-string">&quot;load&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ctx, event</span>) =&gt;</span> {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;loaded&quot;</span>)  <span class="hljs-comment">// Signifiy that the event was run</span>
-  <span class="hljs-keyword">return</span> ctx.<span class="hljs-title function_">pass</span>() <span class="hljs-comment">// Run the original handler</span>
-})
-
- <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;https://echo.zuplo.io&quot;</span>).<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
-   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(error.<span class="hljs-property">message</span>)
- })</pre>
-<h2>Links</h2>
-<ul>
-<li><a href="https://thatrandomperson5.github.io/censorjs/">Docs</a></li>
-<li><a href="#examples">Examples</a></li>
-</ul>
-<h2>Installation</h2>
-<pre class="hljs"><span class="hljs-keyword">import</span> { censor } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;https://cdn.jsdelivr.net/gh/thatrandomperson5/censorjs@master/release/censor.module.min.js&quot;</span></pre>
-<p>or</p>
-<pre class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://cdn.jsdelivr.net/gh/thatrandomperson5/censorjs@master/release/censor.min.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></pre>
-<h2>Usage</h2>
-<p>There are two main parts to the Censor process:</p>
-<ul>
-<li>The censored instance or class (eg. <code>WebSocket</code> or <code>window</code>)</li>
-<li>The censoring object (The <code>CensorObject</code> or <code>CensorClass</code> instance)</li>
-</ul>
-<p>All censor handles applied via the censoring object will directly and permenantly affect the censored instance.
-You can think of the censoring object as a interface that allows for easy creation of censor handles,
-not directly connected to any handles themselves.</p>
-<h3>Instance vs. Class</h3>
-<p>Before you continue, you should know the difference between censoring a instance vs. a class.
-When you censor a instance, you replace current and future calls and triggers with glorified wrappers that handle it your way
-before passing back to the original.
-Censoring a class simply designates a initilization function so that when anyone creates a new instance of that class,
-it automatically comes with a censor on that instance.
-You can think of this as a "group" of sorts so that you can apply one set of handles to any object of your choice.</p>
-<h3>Basic Usage of the Censoring Object</h3>
-<p>The simplest, reccommended way of creating a censoring object is using the <code>censor</code> function.</p>
-<pre class="hljs"><span class="hljs-keyword">var</span> windowCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-variable language_">window</span>)
-<span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-title class_">WebSocket</span>)</pre>
-<p>You can also directly create the classes, but that makes inline chains more difficult (eg. <code>censor(something).first().second()</code>)</p>
-<pre class="hljs"><span class="hljs-keyword">var</span> windowCensor = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CensorObject</span>(<span class="hljs-variable language_">window</span>)
-<span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CensorClass</span>(<span class="hljs-title class_">WebSocket</span>)</pre>
-<p>Instance censors are implemented automatically, whereas class censors must be manually set in a scope (usually global). (Automatic implementation coming soon)</p>
-<pre class="hljs"><span class="hljs-title class_">WebSocket</span> = webSocketCensor.<span class="hljs-title function_">genFunc</span>() <span class="hljs-comment">// Implement your class censoring </span></pre>
-<h3>Censoring Functions</h3>
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Description</th>
-<th>Pass/Next Effect</th>
-<th>Step Graph</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>.whenCall(name, handle)</code></td>
-<td>Register a handle that is called instead whenever <code>name</code> is called.</td>
-<td>Call the original function behind <code>name</code></td>
-<td>Outside Call -> Handle -> Original Function -> Handle Return</td>
-</tr>
-<tr>
-<td><code>.whenAttr(name, handles)</code></td>
-<td>Sets a custom setter and getter for attribute with <code>name</code>. (NO CTX PROVIDED YET)</td>
-<td>Not currently implemented, coming soon</td>
-<td>Outside Set/Get -> Handle</td>
-</tr>
-<tr>
-<td><code>on(event, handle)</code></td>
-<td>A event intercepter that intercepts all event handles of the event <code>event</code></td>
-<td>Call the original handle function.</td>
-<td>Event Triggered -> Handle -> Original Handle -> Handle Return</td>
-</tr>
-</tbody>
-</table>
-<h3>Handles</h3>
-<p>Censor handles are constructed very similarly to the orignal handle/function with exception of the ctx object as the first object.</p>
-<ul>
-<li>You have the option of making a handle a complete replacement of the original by not using ctx.</li>
-<li>Your ways of interacting with the original are calling <code>.next(...args)</code> or <code>.pass</code> which passes argument automatically.</li>
-</ul>
-<p>The general structure goes something like this:</p>
-<pre class="hljs">(ctx) =&gt; {
-  ctx.<span class="hljs-property">args</span>.<span class="hljs-title function_">modify</span>() <span class="hljs-comment">// Change it to your wish</span>
-  <span class="hljs-keyword">var</span> result = ctx.<span class="hljs-title function_">pass</span>()
-  result.<span class="hljs-title function_">modify</span>() <span class="hljs-comment">// Change the result</span>
-  <span class="hljs-keyword">return</span> result;
-}</pre>
-<h3>Async</h3>
-<p>The <code>whenCall</code> function supports async handles. These will should be used when the original function is async and can be enabled by passing <code>async (ctx, arg1) => {doSomething}</code> as a handler.</p>
-<h2>Examples</h2>
-<p>Coming soon</p>
-<h3>Original Tests</h3>
-<pre class="hljs"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;test1&quot;</span>&gt;</span><span class="language-javascript">
-  <span class="hljs-keyword">function</span> <span class="hljs-title function_">log</span>(<span class="hljs-params">txt</span>) {
-    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;outp&quot;</span>).<span class="hljs-property">textContent</span> += txt.<span class="hljs-title function_">toString</span>() + <span class="hljs-string">&quot;\n&quot;</span>
-  }
-
-  <span class="hljs-keyword">function</span> <span class="hljs-title function_">test1</span>(<span class="hljs-params"></span>) {
-    <span class="hljs-title function_">censor</span>(<span class="hljs-variable language_">window</span>, <span class="hljs-literal">true</span>).<span class="hljs-title function_">whenCall</span>(<span class="hljs-string">&quot;fetch&quot;</span>, <span class="hljs-title function_">async</span> (ctx) =&gt; {
-      <span class="hljs-title function_">log</span>(ctx.<span class="hljs-property">args</span>)
-      <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">await</span> ctx.<span class="hljs-title function_">pass</span>()
-      <span class="hljs-title function_">log</span>(result.<span class="hljs-property">status</span>)
-      <span class="hljs-keyword">return</span> result
-    })
-
-    <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;https://echo.zuplo.io&quot;</span>).<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
-      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(error.<span class="hljs-property">message</span>)
-    })
-
-    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;btn&quot;</span>).<span class="hljs-property">onclick</span> = <span class="hljs-function">() =&gt;</span> {
-      <span class="hljs-title function_">alert</span>(<span class="hljs-string">&quot;Hello&quot;</span>)
-    }
-
-    <span class="hljs-title function_">censor</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;btn&quot;</span>)).<span class="hljs-title function_">on</span>(<span class="hljs-string">&quot;click&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ctx, event</span>) =&gt;</span> {
-      <span class="hljs-title function_">log</span>(ctx.<span class="hljs-property">args</span>)
-      <span class="hljs-keyword">return</span> ctx.<span class="hljs-title function_">pass</span>()
-    })
-
-    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;btn&quot;</span>).<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;click&quot;</span>, <span class="hljs-function">() =&gt;</span> {
-      <span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;EVENT CLICK&quot;</span>)
-    })
-  }
-  <span class="hljs-keyword">function</span> <span class="hljs-title function_">test2</span>(<span class="hljs-params"></span>) {
-    <span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-title class_">WebSocket</span>)
-    webSocketCensor.<span class="hljs-title function_">whenCall</span>(<span class="hljs-string">&quot;send&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ctx, data</span>) =&gt;</span> {
-      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data)
-      <span class="hljs-keyword">return</span> ctx.<span class="hljs-title function_">pass</span>()
-    })
-
-    webSocketCensor.<span class="hljs-title function_">on</span>(<span class="hljs-string">&quot;message&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ctx, event</span>) =&gt;</span> {
-      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(event.<span class="hljs-property">data</span>)
-      <span class="hljs-keyword">return</span> ctx.<span class="hljs-title function_">pass</span>()
-    })
-
-    <span class="hljs-title class_">WebSocket</span> = webSocketCensor.<span class="hljs-title function_">genFunc</span>()
-
-    <span class="hljs-keyword">let</span> ws = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebSocket</span>(<span class="hljs-string">&quot;wss://echo.websocket.org/&quot;</span>)
-    ws.<span class="hljs-property">onopen</span> = <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
-      ws.<span class="hljs-title function_">send</span>(<span class="hljs-string">&quot;Here&#x27;s some text that the server is urgently awaiting!&quot;</span>)
-    }
-    ws.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
-      <span class="hljs-title function_">log</span>(event.<span class="hljs-property">data</span>)
-    }
-  }
-</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">code</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;outp&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">code</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;btn&quot;</span>&gt;</span>Button<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></pre>
-
-  
-</section>
-</div>
-          
-        
-          
-            <div class='keyline-top-not py2'><section class='py2 clearfix'>
-
-  <h2 id='api' class='mt0'>
-    API
-  </h2>
-
-  
-    <p>All functions, variables and classes and their types.</p>
-
-  
-</section>
-</div>
-          
-        
-          
           <section class='p2 mb2 clearfix bg-white minishadow'>
 
   
@@ -477,7 +264,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L37-L85'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L37-L85'>
       <span>src/censor.js</span>
       </a>
     
@@ -549,7 +336,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L20-L29'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L20-L29'>
       <span>src/censor.js</span>
       </a>
     
@@ -649,7 +436,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L37-L85'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L37-L85'>
       <span>src/censor.js</span>
       </a>
     
@@ -676,7 +463,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>parent</span> <code class='quiet'>(<a href="#censorobject">CensorObject</a>)</code>
-            The connected Censor object.
+	    The connected Censor object.
 
           </div>
           
@@ -685,7 +472,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the attribute, function, or event that is currently connected.
+	    The name of the attribute, function, or event that is currently connected.
 
           </div>
           
@@ -724,7 +511,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L43-L43'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L43-L43'>
       <span>src/censor.js</span>
       </a>
     
@@ -787,7 +574,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L49-L49'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L49-L49'>
       <span>src/censor.js</span>
       </a>
     
@@ -850,7 +637,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L56-L56'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L56-L56'>
       <span>src/censor.js</span>
       </a>
     
@@ -913,7 +700,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L74-L76'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L74-L76'>
       <span>src/censor.js</span>
       </a>
     
@@ -940,7 +727,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>args</span> <code class='quiet'>(...any)</code>
-            Modified arguments to pass to the original function.
+	    Modified arguments to pass to the original function.
 
           </div>
           
@@ -993,7 +780,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L82-L84'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L82-L84'>
       <span>src/censor.js</span>
       </a>
     
@@ -1067,7 +854,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L93-L97'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L93-L97'>
       <span>src/censor.js</span>
       </a>
     
@@ -1129,7 +916,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L99-L105'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L99-L105'>
       <span>src/censor.js</span>
       </a>
     
@@ -1161,7 +948,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>ctx</span> <code class='quiet'>((<a href="#censorcontext">CensorContext</a> | <a href="#censorcallcontext">CensorCallContext</a>))</code>
-            The passed context.
+	    The passed context.
 
           </div>
           
@@ -1170,7 +957,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>var_args</span> <code class='quiet'>(...any)</code>
-            Any number of arguments passed to the context.
+	    Any number of arguments passed to the context.
 
           </div>
           
@@ -1219,7 +1006,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L113-L308'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L113-L308'>
       <span>src/censor.js</span>
       </a>
     
@@ -1246,7 +1033,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>object</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-            The base object.
+	    The base object.
 
           </div>
           
@@ -1283,7 +1070,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L126-L130'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L126-L130'>
       <span>src/censor.js</span>
       </a>
     
@@ -1310,7 +1097,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>obj</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-            The object to test,
+	    The object to test,
 
           </div>
           
@@ -1319,7 +1106,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>typ</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The expected type.
+	    The expected type.
 
           </div>
           
@@ -1364,7 +1151,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L139-L150'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L139-L150'>
       <span>src/censor.js</span>
       </a>
     
@@ -1391,7 +1178,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>obj</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-            The object to search.
+	    The object to search.
 
           </div>
           
@@ -1400,7 +1187,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the property to retrive.
+	    The name of the property to retrive.
 
           </div>
           
@@ -1410,7 +1197,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
           <div>
             <span class='code bold'>maxdepth</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
             = <code>10</code>)</code>
-            The maximum search depth.
+	    The maximum search depth.
 
           </div>
           
@@ -1471,7 +1258,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L119-L119'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L119-L119'>
       <span>src/censor.js</span>
       </a>
     
@@ -1534,7 +1321,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L169-L171'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L169-L171'>
       <span>src/censor.js</span>
       </a>
     
@@ -1561,7 +1348,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the function.
+	    The name of the function.
 
           </div>
           
@@ -1570,7 +1357,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>args</span> <code class='quiet'>(...any)</code>
-            Arguments to pass.
+	    Arguments to pass.
 
           </div>
           
@@ -1623,7 +1410,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L178-L180'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L178-L180'>
       <span>src/censor.js</span>
       </a>
     
@@ -1650,7 +1437,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the attribute.
+	    The name of the attribute.
 
           </div>
           
@@ -1703,7 +1490,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L187-L189'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L187-L189'>
       <span>src/censor.js</span>
       </a>
     
@@ -1730,7 +1517,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the attribute.
+	    The name of the attribute.
 
           </div>
           
@@ -1739,7 +1526,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>asgn</span> <code class='quiet'>(any)</code>
-            Object to assign.
+	    Object to assign.
 
           </div>
           
@@ -1784,7 +1571,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L197-L223'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L197-L223'>
       <span>src/censor.js</span>
       </a>
     
@@ -1811,7 +1598,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the function.
+	    The name of the function.
 
           </div>
           
@@ -1820,7 +1607,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>handle</span> <code class='quiet'>(<a href="#generichandle">genericHandle</a>)</code>
-            The handler function.
+	    The handler function.
 
           </div>
           
@@ -1873,7 +1660,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L235-L265'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L235-L265'>
       <span>src/censor.js</span>
       </a>
     
@@ -1900,7 +1687,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the function.
+	    The name of the function.
 
           </div>
           
@@ -1909,7 +1696,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>handles</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-            The handler functions.
+	    The handler functions.
 
           </div>
           
@@ -1996,7 +1783,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L275-L307'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L275-L307'>
       <span>src/censor.js</span>
       </a>
     
@@ -2023,7 +1810,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>event</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-            The name of the event.
+	    The name of the event.
 
           </div>
           
@@ -2032,7 +1819,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>handle</span> <code class='quiet'>(<a href="#generichandle">genericHandle</a>)</code>
-            The handle the will be applied to all listeners.
+	    The handle the will be applied to all listeners.
 
           </div>
           
@@ -2093,14 +1880,14 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L316-L383'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L316-L383'>
       <span>src/censor.js</span>
       </a>
     
   </div>
   
 
-  <p>Very similar to <a href="CensorObject">CensorObject</a>, used to censor uninitiated classes on initiation. The <code>genFunc</code> and <code>apply</code> functions listed below is the only unique functions of this class. <code>whenCall</code>, <code>whenAttr</code> and <code>on</code> are all directly equivilent to their <a href="CensorObject">CensorObject</a> counterparts.</p>
+  <p>Very similar to <a href="#censorobject">CensorObject</a>, used to censor uninitiated classes on initiation. The <code>genFunc</code> and <code>apply</code> functions listed below is the only unique functions of this class. <code>whenCall</code>, <code>whenAttr</code> and <code>on</code> are all directly equivilent to their <a href="#censorobject">CensorObject</a> counterparts.</p>
 
     <div class='pre p1 fill-light mt0'>new CensorClass(cls: function (...any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
@@ -2120,7 +1907,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>cls</span> <code class='quiet'>(function (...any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-            The class descriptor function.
+	    The class descriptor function.
 
           </div>
           
@@ -2159,7 +1946,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L352-L365'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L352-L365'>
       <span>src/censor.js</span>
       </a>
     
@@ -2186,7 +1973,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>obj</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-            A instance of the given class or any other fitting object.
+	    A instance of the given class or any other fitting object.
 
           </div>
           
@@ -2239,7 +2026,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L375-L382'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L375-L382'>
       <span>src/censor.js</span>
       </a>
     
@@ -2321,7 +2108,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/347848841f0c72b9f3f2356ffa9c6ce11643f088/src/censor.js#L390-L398'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/8cf460585b0bc2fd7d223ea09eae6bc37d8142f7/src/censor.js#L390-L398'>
       <span>src/censor.js</span>
       </a>
     
@@ -2348,7 +2135,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>obj</span> <code class='quiet'>(any)</code>
-            The object given as a base.
+	    The object given as a base.
 
           </div>
           

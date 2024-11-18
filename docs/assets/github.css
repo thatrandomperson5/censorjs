@@ -78,8 +78,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   color: #008080;
 }
 
-.hljs-regexp,
-.hljs-meta {
+.hljs-regexp {
   color: #009926;
 }
 

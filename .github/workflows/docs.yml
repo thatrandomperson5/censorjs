@@ -53,7 +53,7 @@ jobs:
       - run: echo "docs/$DOCPATH"
         
       - run: >-
-          documentation build src/** -c docs/docs.yml 
+          documentation build src/** -c docs/docs.yml --np
           -t node_modules/@seaturtle/documentationjs-theme/index.js
           --project-name Censor
           --project-version $DOCPATH
@@ -61,7 +61,7 @@ jobs:
           --project-description "A javascript event/function interception library." 
           -f html --github -o docs/$DOCPATH 
           ||
-          documentation build src/**
+          documentation build src/** --np
           --project-name Censor 
           --project-version $DOCPATH
           --project-homepage "https://github.com/thatrandomperson5/censorjs"

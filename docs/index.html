@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="assets/bass.css" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <title>Censor | Documentation Homepage</title>
+    <script>
+      const tagsLoaded = new Event("tagsLoaded")
+
+      var tags = []
+      var latest
+
+      async function init() {
+        let response = await fetch(
+          "https://api.github.com/repos/thatrandomperson5/censorjs/git/refs/tags",
+        )
+        if (!response.ok) {
+          alert(
+            "Something went wrong while fetching versions! Sending you to head version",
+          )
+          window.location.replace("./head/")
+        }
+        let json = await response.json()
+        json.forEach((release) => {
+          tags.push(release["ref"].split("/").at(-1))
+        })
+        tags = tags.reverse()
+        latest = tags[0]
+        if (document.readyState === "complete") {
+          window.dispatchEvent(tagsLoaded)
+        } else {
+          window.onload = () => {
+            window.dispatchEvent(tagsLoaded)
+          }
+        }
+      }
+      init()
+    </script>
+  </head>
+  <body class="documentation my2 mx4">
+    <h2>Censor.js Documentation</h2>
+    <p>
+      Please choose a documentation version.
+      <span id="countDownSegment"
+        >You will be automatically sent to the latest version
+        <span id="latest">(loading...)</span> in
+        <span id="countdown">15</span> seconds.
+        <a id="cancel">(cancel)</a></span
+      >
+      <script>
+        const params = new URLSearchParams(window.location.search)
+        var countDownElement = document.getElementById("countdown")
+
+        if (params.has("noCountdown")) {
+          document.getElementById("countDownSegment").textContent = ""
+        } else {
+          var countDown = 15
+          window.addEventListener("tagsLoaded", () => {
+            let latestUrl = "./" + latest + "/"
+            document.getElementById("latest").innerHTML =
+              `<a href="${latestUrl}">@${latest}</a>`
+
+            let id = setInterval(() => {
+              countDown -= 1
+              if (countDown === 0) {
+                window.location.replace(latestUrl)
+              }
+              countDownElement.textContent = countDown.toString()
+            }, 1000)
+            document.getElementById("cancel").onclick = () => {
+              clearInterval(id)
+              countDownElement.textContent = "(canceled)"
+            }
+          })
+        }
+      </script>
+    </p>
+
+    <ul id="tagList">
+      <li><a href="./head/">@HEAD</a></li>
+      <li id="loading">loading...</li>
+    </ul>
+    <script>
+      window.addEventListener("tagsLoaded", () => {
+        document.getElementById("loading").outerHTML = ""
+        let tagList = document.getElementById("tagList")
+        tags.forEach((tag) => {
+          tagList.innerHTML += `
+       <li><a href="./${tag}/">@${tag}</a></li>
+       `
+        })
+      })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@seaturtle/documentationjs-theme": "gitlab:seaturtle.dev/documentationjs-theme"
+  }
+}

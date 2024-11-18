@@ -3,7 +3,8 @@ toc:
     file: ../README.md
     
   - name: API
-    description: All functions, variables and classes and their types.
+    description: | 
+      All functions, variables and classes and their types. 
 
-  - name: [Other Versions](https://thatrandomperson5.github.io/censorjs/index.html?noCountdown)
-      
+      Other documentation versions can be found [here](https://thatrandomperson5.github.io/censorjs/?noCountDown).
+    

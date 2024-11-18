@@ -44,8 +44,7 @@ jobs:
           node-version: 18
       - run: npm install -g documentation
       - run: npm install git+https://gitlab.com/seaturtle.dev/documentationjs-theme.git
-      - run: ls node_modules
-      - run: exit 1
+      - run: ls node_modules/@seaturtle
 
       - run: echo "DOCPATH=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
         if: github.event.inputs.tag != ''
@@ -55,7 +54,7 @@ jobs:
       - run: echo "docs/$DOCPATH"
         
       - run: >-
-          documentation build src/** -c docs/docs.yml -t seaturtle
+          documentation build src/** -c docs/docs.yml -t node_modules/@seaturtle/documentationjs-theme
           --project-name Censor
           --project-version $DOCPATH
           --project-homepage "https://github.com/thatrandomperson5/censorjs"

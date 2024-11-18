@@ -1,5 +1,5 @@
 /**
- * A event & call interception library for javascript. See [README](https://github.com/thatrandomperson5/censorjs/blob/main/README.md) for more examples and non-doc details.
+ * The main module of the Censor library. Contains all core features.
  * @module Censor
  * @example
  * censor(window).whenCall("fetch", async (ctx) => {
@@ -88,12 +88,21 @@ class CensorContext {
  * A class for providing context and interaction within the Censor handle.
  * @class
  * @public
+ * @deprecated - since 0.1.1
  */
 class CensorCallContext extends CensorContext {
   next(...args) {
     return this.parent.call(this.name, ...args)
   }
 }
+
+/**
+ * The main callback function type. Note that the effects of `.pass()`/`.next()` change based om where the context was assigned from. ([See Pass/NextEffect](https://github.com/thatrandomperson5/censorjs/tree/main?tab=readme-ov-file#censoring-functions))
+ * @callback genericHandle
+ * @param {CensorContext|CensorCallContext} ctx - The passed context.
+ * @param {...*} var_args - Any number of arguments passed to the context.
+ * @returns {*} - The result you want to be passed to the original.
+ */
 
 /**
  * The main Censor class. Applies censor effects to any object, and effects are independent of the Censor class object.
@@ -103,21 +112,11 @@ class CensorCallContext extends CensorContext {
  */
 class CensorObject {
   /**
-   * The main callback function type. Remember to always call {@link CensorContext#pass} or {@link CensorContext#next} within but not both.
-   * @callback genericHandle
-   * @param {CensorContext|CensorCallContext} ctx - The passed context.
-   * @param {...*} var_args - Any number of arguments passed to the context.
-   * @returns {*} - The result you want to be passed to the original.
-   *
-   */
-
-  /**
    * Reference to the original object.
    * @type {Object}
    * @public
    */
   object
-  #eventHandleCache
 
   /**
    * A type assertion util based on `typeof`
@@ -157,23 +156,36 @@ class CensorObject {
   constructor(object) {
     CensorObject.typeCheck(object, "object")
     this.object = object
-    this.#eventHandleCache = {}
   }
 
   // Functions
 
   /**
    * Call the base function from base object with name and args.
-   * @private
    * @param {string} name - The name of the function.
    * @param {...*} args - Arguments to pass.
    * @returns {*} - The function result
    */
   call(name, ...args) {
-    if (!this.object.hasOwnProperty("_CENSOR_" + name)) {
-      throw new TypeError('Unregistered function binding for "' + name + '"')
-    }
-    return this.object["_CENSOR_" + name](...args)
+    return this.object["_CENSOR_" + name](...args) // Required because certain functions can only be called from the right class
+  }
+
+  /**
+   * Call the base getter for name from base object.
+   * @param {string} name - The name of the attribute.
+   * @returns {*} - The value that was originally returned.
+   */
+  getAttr(name) {
+    return this.object["_CENSOR_get_" + name]() // Required because certain functions can only be called from the right class
+  }
+
+  /**
+   * Call the base setter for name from base object.
+   * @param {string} name - The name of the attribute.
+   * @param {*} asgn - Object to assign.
+   */
+  setAttr(name, asgn) {
+    this.object["_CENSOR_set_" + name](asgn) // Required because certain functions can only be called from the right class
   }
 
   /**
@@ -190,7 +202,10 @@ class CensorObject {
       this.object["_CENSOR_" + name] = this.object[name] // Override old hooks
     }
 
-    var ctx = new CensorCallContext(this, name)
+    var ctx = new CensorContext(this, name)
+    ctx.callback = (...args) => {
+      return this.call(name, ...args)
+    }
     var f
     if (handle[Symbol.toStringTag] === "AsyncFunction") {
       f = async (...args) => {
@@ -212,7 +227,9 @@ class CensorObject {
   /**
    * Register a handle for when a attribute with name is modified or retrived from base object
    * @param {string} name - The name of the function.
-   * @param {PropertyDescription} handles - The handler functions. (generic JS callback, only accepts get and set)
+   * @param {Object} handles - The handler functions.
+   * @param {genericHandle} [handles.get] - The get handler for the attribute.
+   * @param {genericHandle} [handles.set] - The set handler for the attribute.
    * @returns {CensorObject} - Returns self for chaining.
    */
   whenAttr(name, handles) {
@@ -222,17 +239,24 @@ class CensorObject {
     let description = CensorObject.getPropertyDescriptor(this.object, name)
     this.object["_CENSOR_set_" + name] = description["set"]
     this.object["_CENSOR_get_" + name] = description["get"]
-    let originalObject = this.object
+    let originalObject = this
 
     var desc = {}
+    var context = new CensorContext(this, name)
+
     if (handles.hasOwnProperty("get")) {
       desc["get"] = () => {
-        return handles["get"](originalObject["_CENSOR_get_" + name]())
+        context.args = []
+        context.callback = () => originalObject.getAttr(name)
+        return handles["get"](context)
       }
     }
     if (handles.hasOwnProperty("set")) {
       desc["set"] = (asgn) => {
-        originalObject["_CENSOR_set_" + name](handles["set"](asgn))
+        context.args = [asgn]
+        context.callback = (_asgn) => originalObject.setAttr(name, _asgn)
+
+        handles["set"](context, asgn)
       }
     }
 
@@ -255,16 +279,15 @@ class CensorObject {
     let topLevelObj = this
     let prev = this.object["on" + event]
     let prevAdd = this.object.addEventListener
-    this.#eventHandleCache[event] = handle
 
     this.whenAttr("on" + event, {
-      set: (internal) => {
-        return (...args) => {
+      set: (ctx, internal) => {
+        ctx.next((...args) => {
           var ctx = new CensorContext(topLevelObj, event)
           ctx.callback = internal
           ctx.args = args
           return handle(ctx, ...args)
-        }
+        })
       },
     })
     this.object["on" + event] = prev // apply to old attribute
@@ -285,7 +308,7 @@ class CensorObject {
 }
 
 /**
- * Practiaclly identical function-wise to {@link CensorObject}, used to censor uninitiated classes. The `genFunc` and `apply` functions listed below is the only unique functions of this class.
+ * Very similar to {@link CensorObject}, used to censor uninitiated classes on initiation. The `genFunc` and `apply` functions listed below is the only unique functions of this class. `whenCall`, `whenAttr` and `on` are all directly equivilent to their {@link CensorObject} counterparts.
  * @class
  * @constructor
  * @public
@@ -321,9 +344,8 @@ class CensorClass {
     return this
   }
 
-
   /**
-   * Apply all censor handles to a instance of the given class. 
+   * Apply all censor handles to a instance of the given class.
    * @param {Object} obj - A instance of the given class or any other fitting object.
    * @returns {CensorClass} - Returns self for chaining.
    */

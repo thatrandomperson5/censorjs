@@ -67,7 +67,7 @@ WebSocket = webSocketCensor.genFunc() // Implement your class censoring
 | Name | Description | Pass/Next Effect | Step Graph |
 |---|---|---|---|
 | `.whenCall(name, handle)` | Register a handle that is called instead whenever `name` is called. | Call the original function behind `name` | Outside Call -> Handle -> Original Function -> Handle Return |
-| `.whenAttr(name, handles)` | Sets a custom setter and getter for attribute with `name`. (NO CTX PROVIDED YET) | Not currently implemented, coming soon | Outside Set/Get -> Handle |
+| `.whenAttr(name, handles)` | Sets a custom setter and getter for property with `name`. | Get or set the property | Outside Set/Get -> Handle -> Internal Get/Set -> Handle Return |
 | `on(event, handle)` | A event intercepter that intercepts all event handles of the event `event` | Call the original handle function. | Event Triggered -> Handle -> Original Handle -> Handle Return |
 
 ### Handles

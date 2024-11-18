@@ -35,7 +35,7 @@ const cyrb53 = (str, seed = 0) => {
  * @param {softRefreshCallback} handle - The handle to execute.
  * @param {Object} [options={}] - The options object.
  * @param {Object} [options.pass] - A json serializable object to pass to the handle after load.
- * @param {{URL|string}[]} [options.resources] - A list of links to libraries or other resources you want avalible in your handle.
+ * @param {(URL|string)[]} [options.resources] - A list of links to libraries or other resources you want avalible in your handle.
  * @param {function(Document)} [options.processer] - Any custom operations on the document before the soft refresh.
  * @paran {bool} [options.useCurrentState] - Use current html instead of fetching default.
  * @returns {Promise} - The promise that resolves the function.

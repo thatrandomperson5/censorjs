@@ -91,6 +91,20 @@ The `whenCall` function supports async handles. These will should be used when t
 ## Examples
 Coming soon
 
+### Injection Tooling Examples
+`softRefresh` example (installing eruda mobile console before anything else loaded)
+```js
+softRefresh(
+  () => {
+    alert("Hello world")
+    eruda.init()
+  },
+  {
+    resources: ["https://cdn.jsdelivr.net/npm/eruda"],
+  },
+)
+```
+
 ### Original Tests
 ```html
 <script id="test1">

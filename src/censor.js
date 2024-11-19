@@ -315,6 +315,12 @@ class CensorObject {
  */
 class CensorClass {
   cls
+  /**
+   * The name of the passed class or the given name
+   * @public
+   * @type {string}
+   */
+  name
   #eventHandles
   #callHandles
   #attrHandles
@@ -322,13 +328,19 @@ class CensorClass {
   /**
    * Create a CensorClass object
    * @param {function(...*):Object} cls - The class descriptor function.
+   * @param {string|null} [accessName=null] - The name this class is accessed by publicly. (For example, `WebSocket` is internally named `E`, so this would be needed)
+   * @param {Object|null} [implementOn=window] - The object to automatically implement the result `genFunc()` onto.
    */
-  constructor(cls) {
+  constructor(cls, accessName=null, implementOn=window) {
     CensorObject.typeCheck(cls, "function")
     this.cls = cls
+    this.name = accessName ?? cls.name
     this.#eventHandles = {}
     this.#callHandles = {}
     this.#attrHandles = {}
+    if (implementOn !== null) {
+      implementOn[this.name] = this.genFunc()
+    }
   }
 
   whenCall(name, handle) {
@@ -367,7 +379,7 @@ class CensorClass {
   /**
    * Generate a class initalization function to be used as a replacement.
    * @example
-   * var webSocketCensor = censor(WebSocket)
+   * var webSocketCensor = censor(WebSocket, null, null)
    * // censor stuff
    * WebSocket = webSocketCensor.getFunc()
    * @returns {function(...*):Object} - Returns a valid initalization function.
@@ -385,13 +397,14 @@ class CensorClass {
 /**
  * Properly censor the given object if able
  * @param {*} obj - The object given as a base.
+ * @param {...*} options - Options to pass to the Censor constructor.
  * @returns {CensorObject|CensorClass} - The Censor object used to apply handles.
  */
-function censor(obj) {
+function censor(obj, ...options) {
   if (typeof obj === "object") {
-    return new CensorObject(obj)
+    return new CensorObject(obj, ...options)
   } else if (obj instanceof Object) {
-    return new CensorClass(obj)
+    return new CensorClass(obj, ...options)
   } else {
     throw new TypeError("Can't install censor on " + typeof obj)
   }

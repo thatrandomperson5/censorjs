@@ -22,12 +22,12 @@ jobs:
       - run: cp src/injection-tooling.js release/injection-tooling.module.js
       - run: echo "export {censorResource, softRefresh}" >> release/injection-tooling.module.js
       
-      - run: npm i minify -g
-      - run: minify src/censor.js > release/censor.min.js
-      - run: minify release/censor.module.js > release/censor.module.min.js
+      - run: npm install uglify-js -g
+      - run: uglifyjs src/censor.js -c -m reserved=["censor"] > release/censor.min.js
+      - run: uglifyjs release/censor.module.js -c -m > release/censor.module.min.js
 
-      - run: minify src/injection-tooling.js > release/injection-tooling.min.js
-      - run: minify release/injection-tooling.module.js > release/injection-tooling.module.min.js
+      - run: uglifyjs src/injection-tooling.js -c -m reserved=["censorResource", "softRefresh"] > release/injection-tooling.min.js
+      - run: uglifyjs release/injection-tooling.module.js -c -m > release/injection-tooling.module.min.js
       
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

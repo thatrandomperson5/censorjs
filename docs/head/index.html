@@ -381,12 +381,13 @@ You can think of this as a "group" of sorts so that you can apply one set of han
 <h3>Basic Usage of the Censoring Object</h3>
 <p>The simplest, reccommended way of creating a censoring object is using the <code>censor</code> function.</p>
 <pre class="hljs"><span class="hljs-keyword">var</span> windowCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-variable language_">window</span>)
-<span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-title class_">WebSocket</span>)</pre>
+<span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-title class_">WebSocket</span>, <span class="hljs-string">&quot;WebSocket&quot;</span>) <span class="hljs-comment">// &quot;WebSocket&quot; argument is required becuase &quot;WebSocket&quot; is not called &quot;WebSocket&quot; natively (it&#x27;s classname is different)</span></pre>
 <p>You can also directly create the classes, but that makes inline chains more difficult (eg. <code>censor(something).first().second()</code>)</p>
 <pre class="hljs"><span class="hljs-keyword">var</span> windowCensor = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CensorObject</span>(<span class="hljs-variable language_">window</span>)
-<span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CensorClass</span>(<span class="hljs-title class_">WebSocket</span>)</pre>
-<p>Instance censors are implemented automatically, whereas class censors must be manually set in a scope (usually global). (Automatic implementation coming soon)</p>
-<pre class="hljs"><span class="hljs-title class_">WebSocket</span> = webSocketCensor.<span class="hljs-title function_">genFunc</span>() <span class="hljs-comment">// Implement your class censoring </span></pre>
+<span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CensorClass</span>(<span class="hljs-title class_">WebSocket</span>, <span class="hljs-string">&quot;WebSocket&quot;</span>) <span class="hljs-comment">// &quot;WebSocket&quot; argument is required becuase &quot;WebSocket&quot; is not called &quot;WebSocket&quot; natively (it&#x27;s classname is different)</span></pre>
+<p>Instance censors and class censors are implemented automatically, but class censors can also be set manually in the scope.</p>
+<pre class="hljs"><span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-title class_">WebSocket</span>, <span class="hljs-string">&quot;WebSocket&quot;</span>, <span class="hljs-literal">null</span>) <span class="hljs-comment">// Last null signifies that you are manually implementing it. </span>
+<span class="hljs-title class_">WebSocket</span> = webSocketCensor.<span class="hljs-title function_">genFunc</span>() <span class="hljs-comment">// Implement your class censoring </span></pre>
 <h3>Censoring Functions</h3>
 <table>
 <thead>
@@ -478,7 +479,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     })
   }
   <span class="hljs-keyword">function</span> <span class="hljs-title function_">test2</span>(<span class="hljs-params"></span>) {
-    <span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-title class_">WebSocket</span>)
+    <span class="hljs-keyword">var</span> webSocketCensor = <span class="hljs-title function_">censor</span>(<span class="hljs-title class_">WebSocket</span>, <span class="hljs-string">&quot;WebSocket&quot;</span>)
     webSocketCensor.<span class="hljs-title function_">whenCall</span>(<span class="hljs-string">&quot;send&quot;</span>, <span class="hljs-function">(<span class="hljs-params">ctx, data</span>) =&gt;</span> {
       <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data)
       <span class="hljs-keyword">return</span> ctx.<span class="hljs-title function_">pass</span>()
@@ -488,8 +489,6 @@ You can think of this as a "group" of sorts so that you can apply one set of han
       <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(event.<span class="hljs-property">data</span>)
       <span class="hljs-keyword">return</span> ctx.<span class="hljs-title function_">pass</span>()
     })
-
-    <span class="hljs-title class_">WebSocket</span> = webSocketCensor.<span class="hljs-title function_">genFunc</span>()
 
     <span class="hljs-keyword">let</span> ws = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebSocket</span>(<span class="hljs-string">&quot;wss://echo.websocket.org/&quot;</span>)
     ws.<span class="hljs-property">onopen</span> = <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
@@ -535,7 +534,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L37-L85'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L37-L85'>
       <span>src/censor.js</span>
       </a>
     
@@ -607,7 +606,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L20-L29'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L20-L29'>
       <span>src/censor.js</span>
       </a>
     
@@ -707,7 +706,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L37-L85'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L37-L85'>
       <span>src/censor.js</span>
       </a>
     
@@ -782,7 +781,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L43-L43'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L43-L43'>
       <span>src/censor.js</span>
       </a>
     
@@ -845,7 +844,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L49-L49'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L49-L49'>
       <span>src/censor.js</span>
       </a>
     
@@ -908,7 +907,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L56-L56'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L56-L56'>
       <span>src/censor.js</span>
       </a>
     
@@ -971,7 +970,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L74-L76'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L74-L76'>
       <span>src/censor.js</span>
       </a>
     
@@ -1051,7 +1050,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L82-L84'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L82-L84'>
       <span>src/censor.js</span>
       </a>
     
@@ -1125,7 +1124,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L93-L97'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L93-L97'>
       <span>src/censor.js</span>
       </a>
     
@@ -1187,7 +1186,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L99-L105'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L99-L105'>
       <span>src/censor.js</span>
       </a>
     
@@ -1277,7 +1276,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L113-L308'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L113-L308'>
       <span>src/censor.js</span>
       </a>
     
@@ -1341,7 +1340,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L126-L130'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L126-L130'>
       <span>src/censor.js</span>
       </a>
     
@@ -1422,7 +1421,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L139-L150'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L139-L150'>
       <span>src/censor.js</span>
       </a>
     
@@ -1529,7 +1528,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L119-L119'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L119-L119'>
       <span>src/censor.js</span>
       </a>
     
@@ -1592,7 +1591,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L169-L171'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L169-L171'>
       <span>src/censor.js</span>
       </a>
     
@@ -1681,7 +1680,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L178-L180'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L178-L180'>
       <span>src/censor.js</span>
       </a>
     
@@ -1761,7 +1760,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L187-L189'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L187-L189'>
       <span>src/censor.js</span>
       </a>
     
@@ -1842,7 +1841,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L197-L223'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L197-L223'>
       <span>src/censor.js</span>
       </a>
     
@@ -1931,7 +1930,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L235-L265'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L235-L265'>
       <span>src/censor.js</span>
       </a>
     
@@ -2054,7 +2053,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L275-L307'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L275-L307'>
       <span>src/censor.js</span>
       </a>
     
@@ -2151,7 +2150,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L316-L395'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L316-L395'>
       <span>src/censor.js</span>
       </a>
     
@@ -2243,7 +2242,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L323-L323'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L323-L323'>
       <span>src/censor.js</span>
       </a>
     
@@ -2306,7 +2305,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L364-L377'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L364-L377'>
       <span>src/censor.js</span>
       </a>
     
@@ -2386,7 +2385,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
   <div class='clearfix'>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L387-L394'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L387-L394'>
       <span>src/censor.js</span>
       </a>
     
@@ -2468,7 +2467,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/censor.js#L403-L411'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/censor.js#L403-L411'>
       <span>src/censor.js</span>
       </a>
     
@@ -2553,7 +2552,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/injection-tooling.js#L2-L2'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/injection-tooling.js#L2-L2'>
       <span>src/injection-tooling.js</span>
       </a>
     
@@ -2612,7 +2611,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/injection-tooling.js#L10-L24'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/injection-tooling.js#L10-L24'>
       <span>src/injection-tooling.js</span>
       </a>
     
@@ -2698,7 +2697,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/injection-tooling.js#L26-L30'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/injection-tooling.js#L26-L30'>
       <span>src/injection-tooling.js</span>
       </a>
     
@@ -2773,7 +2772,7 @@ You can think of this as a "group" of sorts so that you can apply one set of han
     </h3>
     
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/7366c92f1689b7696934605df9b381a60192826b/src/injection-tooling.js#L43-L99'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/thatrandomperson5/censorjs/blob/5678342558922353165ab92de8fe7db6886e73f7/src/injection-tooling.js#L43-L99'>
       <span>src/injection-tooling.js</span>
       </a>
     

@@ -26,7 +26,7 @@ jobs:
       - run: uglifyjs src/censor.js -c -m reserved=["censor"] > release/censor.min.js
       - run: uglifyjs release/censor.module.js -c -m > release/censor.module.min.js
 
-      - run: uglifyjs src/injection-tooling.js -c -m reserved=["censorResource", "softRefresh"] > release/injection-tooling.min.js
+      - run: uglifyjs src/injection-tooling.js -c -m reserved=["censorResource","softRefresh"] > release/injection-tooling.min.js
       - run: uglifyjs release/injection-tooling.module.js -c -m > release/injection-tooling.module.min.js
       
       - name: Create Pull Request

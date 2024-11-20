@@ -54,14 +54,13 @@ class CensorContext {
    * @public
    */
   callback
-  
+
   /**
-    * The object that the Context is attached to.
+   * The object that the Context is attached to.
    * @type {*}
    * @public
    */
   subject
-
 
   /**
    * Create a context object. (Not for general use)
@@ -94,6 +93,17 @@ class CensorContext {
    */
   pass() {
     return this.next(...this.args)
+  }
+
+  /** 
+   * Shallow copy the current object.
+   * @returns {CensorContext} the copied objevt
+   */
+  expandUpon() {
+    var output = new this.constructor(this.parent, this.name)
+    output.args = this.args ?? []
+    output.callback = this.callback ?? (() => {})
+    return output
   }
 }
 
@@ -222,13 +232,15 @@ class CensorObject {
     var f
     if (handle[Symbol.toStringTag] === "AsyncFunction") {
       f = async (...args) => {
-        ctx.args = args
-        return await handle(ctx, ...args)
+        var _ctx = ctx.expandUpon()
+        _ctx.args = args
+        return await handle(_ctx, ...args)
       }
     } else {
       f = (...args) => {
-        ctx.args = args
-        return handle(ctx, ...args)
+        var _ctx = ctx.expandUpon()
+        _ctx.args = args
+        return handle(_ctx, ...args)
       }
     }
     this.object[name] = f
@@ -259,17 +271,19 @@ class CensorObject {
 
     if (handles.hasOwnProperty("get")) {
       desc["get"] = () => {
-        context.args = []
-        context.callback = () => originalObject.getAttr(name)
-        return handles["get"](context)
+        var _context = context.expandUpon()
+        _context.args = []
+        _context.callback = () => originalObject.getAttr(name)
+        return handles["get"](_context)
       }
     }
     if (handles.hasOwnProperty("set")) {
       desc["set"] = (asgn) => {
-        context.args = [asgn]
-        context.callback = (_asgn) => originalObject.setAttr(name, _asgn)
+        var _context = context.expandUpon()
+        _context.args = [asgn]
+        _context.callback = (_asgn) => originalObject.setAttr(name, _asgn)
 
-        handles["set"](context, asgn)
+        handles["set"](_context, asgn)
       }
     }
 

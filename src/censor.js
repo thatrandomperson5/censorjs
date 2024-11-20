@@ -54,6 +54,14 @@ class CensorContext {
    * @public
    */
   callback
+  
+  /**
+    * The object that the Context is attached to.
+   * @type {*}
+   * @public
+   */
+  subject
+
 
   /**
    * Create a context object. (Not for general use)
@@ -64,6 +72,11 @@ class CensorContext {
     CensorObject.typeCheck(name, "string")
     this.parent = parent
     this.name = name
+    if (parent instanceof CensorClass) {
+      this.subject = parent.cls
+    } else {
+      this.subject = parent.object
+    }
   }
 
   /**

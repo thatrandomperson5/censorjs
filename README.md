@@ -69,7 +69,8 @@ WebSocket = webSocketCensor.genFunc() // Implement your class censoring
 |---|---|---|---|
 | `.whenCall(name, handle)` | Register a handle that is called instead whenever `name` is called. | Call the original function behind `name` | Outside Call -> Handle -> Original Function -> Handle Return |
 | `.whenAttr(name, handles)` | Sets a custom setter and getter for property with `name`. | Get or set the property | Outside Set/Get -> Handle -> Internal Get/Set -> Handle Return |
-| `on(event, handle)` | A event intercepter that intercepts all event handles of the event `event` | Call the original handle function. | Event Triggered -> Handle -> Original Handle -> Handle Return |
+| `.on(event, handle)` | A event intercepter that intercepts all event handles of the event `event` | Call the original handle function. | Event Triggered -> Handle -> Original Handle -> Handle Return |
+| `.whenCreate(handle)` | A instance creation interceptor (before other intercepters are added) | Call the original `new ClassName(...args)` function. | Creation Called -> Handle -> Constructor -> Handle Return -> Other Interception Added -> Return Final |
 
 ### Handles
 Censor handles are constructed very similarly to the orignal handle/function with exception of the ctx object as the first object.
@@ -157,6 +158,15 @@ softRefresh(
     ws.onmessage = (event) => {
       log(event.data)
     }
+  }
+  
+  function test3() {
+    var urlc = censor(URL)
+    urlc.whenCreate((ctx) => {
+      log(ctx.args)
+      return ctx.pass()
+    })
+    let url = new URL("https://google.com")
   }
 </script>
 <pre><code id="outp"></code></pre>

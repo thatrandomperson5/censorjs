@@ -52,16 +52,16 @@ You can think of this as a "group" of sorts so that you can apply one set of han
 The simplest, reccommended way of creating a censoring object is using the `censor` function.
 ```js
 var windowCensor = censor(window)
-var webSocketCensor = censor(WebSocket, "WebSocket") // "WebSocket" argument is required becuase "WebSocket" is not called "WebSocket" natively (it's classname is different)
+var webSocketCensor = censor(WebSocket)
 ```
 You can also directly create the classes, but that makes inline chains more difficult (eg. `censor(something).first().second()`)
 ```js
 var windowCensor = new CensorObject(window)
-var webSocketCensor = new CensorClass(WebSocket, "WebSocket") // "WebSocket" argument is required becuase "WebSocket" is not called "WebSocket" natively (it's classname is different)
+var webSocketCensor = new CensorClass(WebSocket)
 ```
 Instance censors and class censors are implemented automatically, but class censors can also be set manually in the scope.
 ```js
-var webSocketCensor = censor(WebSocket, "WebSocket", null) // Last null signifies that you are manually implementing it. 
+var webSocketCensor = censor(WebSocket, null, null) // Last null signifies that you are manually implementing it. 
 WebSocket = webSocketCensor.genFunc() // Implement your class censoring 
 ```
 ### Censoring Functions

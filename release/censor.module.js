@@ -308,7 +308,7 @@ class CensorObject {
 }
 
 /**
- * Very similar to {@link CensorObject}, used to censor uninitiated classes on initiation. The `genFunc` and `apply` functions listed below is the only unique functions of this class. `whenCall`, `whenAttr` and `on` are all directly equivilent to their {@link CensorObject} counterparts.
+ * Very similar to {@link CensorObject}, used to censor uninitiated classes on initiation. `whenCall`, `whenAttr` and `on` are all directly equivilent to their {@link CensorObject} counterparts.
  * @class
  * @constructor
  * @public
@@ -321,6 +321,7 @@ class CensorClass {
    * @type {string}
    */
   name
+  #createHandle
   #eventHandles
   #callHandles
   #attrHandles
@@ -331,7 +332,7 @@ class CensorClass {
    * @param {string|null} [accessName=null] - The name this class is accessed by publicly. (For example, `WebSocket` is internally named `E`, so this would be needed)
    * @param {Object|null} [implementOn=window] - The object to automatically implement the result `genFunc()` onto.
    */
-  constructor(cls, accessName=null, implementOn=window) {
+  constructor(cls, accessName = null, implementOn = window) {
     CensorObject.typeCheck(cls, "function")
     this.cls = cls
     this.name = accessName ?? cls.name
@@ -341,6 +342,16 @@ class CensorClass {
     if (implementOn !== null) {
       implementOn[this.name] = this.genFunc()
     }
+  }
+
+  /**
+   * Register a handle for when a instance of the linked class is created.
+   * @param {genericHandle} handle - The handle the will be applied to when it is created.
+   * @returns {CensorObject} - Returns self for chaining.
+   */
+  whenCreate(handle) {
+    this.#createHandle = handle
+    return this
   }
 
   whenCall(name, handle) {
@@ -387,7 +398,15 @@ class CensorClass {
   genFunc() {
     let originalObject = this
     return function (...args) {
-      var result = new originalObject.cls(...args)
+      var result
+      if (originalObject.#createHandle) {
+        var ctx = new CensorContext(originalObject, "_CENSOR_create")
+        ctx.args = args
+        ctx.callback = (..._args) => new originalObject.cls(..._args)
+        result = originalObject.#createHandle(ctx, ...args)
+      } else {
+        result = new originalObject.cls(...args)
+      }
       originalObject.apply(result)
       return result
     }

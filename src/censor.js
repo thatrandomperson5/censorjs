@@ -95,7 +95,7 @@ class CensorContext {
     return this.next(...this.args)
   }
 
-  /** 
+  /**
    * Shallow copy the current object.
    * @returns {CensorContext} the copied objevt
    */
@@ -317,7 +317,9 @@ class CensorObject {
         })
       },
     })
-    this.object["on" + event] = prev // apply to old attribute
+    if (typeof prev !== "undefined") {
+      this.object["on" + event] = prev // apply to old attribute
+    }
     this.whenCall("addEventListener", (ctx, type, listener, other) => {
       var newCtx = new CensorContext(topLevelObj, event)
       newCtx.callback = listener

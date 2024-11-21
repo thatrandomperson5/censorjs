@@ -311,7 +311,7 @@ class CensorObject {
       set: (ctx, internal) => {
         ctx.next((...args) => {
           var ctx = new CensorContext(topLevelObj, event)
-          ctx.callback = internal
+          ctx.callback = internal ?? (() => {})
           ctx.args = args
           return handle(ctx, ...args)
         })
@@ -322,7 +322,7 @@ class CensorObject {
     }
     this.whenCall("addEventListener", (ctx, type, listener, other) => {
       var newCtx = new CensorContext(topLevelObj, event)
-      newCtx.callback = listener
+      newCtx.callback = listener ?? (() => {})
       ctx.next(
         type,
         (...args) => {

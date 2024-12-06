@@ -87,6 +87,17 @@ async function softRefresh(handle, options = {}) {
     }
   }
 
+  // Force load
+  var loader = newDocument.createElement("script")
+  loader.id = "softRefresh-loader"
+  loader.textContent = `
+  (() => {
+    dispatchEvent(new Event('load'));
+    dispatchEvent(new Event('DOMContentLoaded'));
+  })();
+  `
+  newDocument.body.append(loader)
+
   if (typeof options.processor === "function") {
     options.processor(newDocument) // process
   }
